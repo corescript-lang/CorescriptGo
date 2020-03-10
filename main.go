@@ -5,24 +5,25 @@ import (
 	"strings"
 	"strconv"
 //	"encoding/json"
-//	"regexp"
+	"regexp"
 )
 
 func main() {
-	code := [3]string{"print ¡Hola de Go!", "newline", "print Hello from Go!"}
+	code := [3]string{"print ¡Hola de Go!", "newline", "print Hello from Go! (test)"}
 	
-	variables := map[string]string{}
+	varVals := map[string]string{}
+	varList := map[string]string{}
 	err := ""
-
+	
 	for i := 0; i < len(code); i++ {
 		currentLine := code[i]
 		split := strings.Fields(currentLine)
 		
 		if split[0] == "print" {
 			toPrint := currentLine[6:]
-			
-			//match, _ := regexp.ReplaceAllLiteral(toPrint, "\(([a-zA-Z-_]+)\)", "$get1")
-			fmt.Print(toPrint)
+			regex := regexp.MustCompile(`\(([a-zA-Z-_]+)\)`)
+			match := regex.ReplaceAllString(toPrint, parse("$1", variables))
+			fmt.Print(match)
 		} else if split[0] == "goto" {
 			newI, _ := strconv.Atoi(currentLine[5:])
 			newI -= 2 // For loop adds 1?
@@ -32,7 +33,8 @@ func main() {
 			if split[2] != "=" {
 				err = "Variable error"
 			} else {
-				variables[split[1]] = split[3]
+				varVals[split[1]] = split[3]
+				append(varList, split[3])
 			}
                 } else if split[0] == "newline" {
 			fmt.Println("")
@@ -46,3 +48,10 @@ func main() {
 	fmt.Println("")
 }
 
+func parse(string) {
+	for i := 0; i < len(varList); i++ {
+		if string == varList[i] {
+			return varVals[string]
+		}
+	}
+}
