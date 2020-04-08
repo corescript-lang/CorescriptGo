@@ -21,22 +21,39 @@ func parse(string string, varListP []string, varValsP []string) string {
 func run(code []string) {
 	varNames := []string{}
 	varVals := []string{}
+	
+	labelNames := []string{}
+	labelLines := []int{}
 
-	for i := 0; i < len(code) - 1; i++ { // -1 is because of naughty files!!
+	for l := 0; l < len(code); l++ {
+		firstChar := code[l][0:1]
+		
+		if firstChar == ":" {
+			label := code[l][1:]
+
+			append(labelNames, label)
+			append(labelLines, l)
+		}
+	}
+	
+
+	for i := 0; i < len(code); i++ { // -1 is because of naughty files!!
 		currentLine := code[i]
 		split := strings.Fields(currentLine)
 
 		if split[0] == "print" {
-
 			toPrint := currentLine[6:]
 			fmt.Print(parse(toPrint, varNames, varVals))
+			
+			fmt.Print("\n")
 
 		} else if split[0] == "goto" {
-
-			newI, _ := strconv.Atoi(currentLine[5:])
-			newI -= 2 // For loop adds 1?
-
-			i = newI
+			newI, err := strconv.Atoi(currentLine[5:])
+			
+			if err == nil {
+				newI -= 2 // For loop adds 1?
+				i = newI
+			}
 
 		} else if split[0] == "var" {
 			if split[2] != "=" {
@@ -46,13 +63,9 @@ func run(code []string) {
 				varVals = append(varVals, split[3])
 			}
 
-        } else if split[0] == "newline" {
-			fmt.Println("")
-		} else {
+        } else {
 			fmt.Println("error")
 		}
-
-		fmt.Println("\n")
 	}
 }
 
